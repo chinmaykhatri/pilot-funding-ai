@@ -1,8 +1,24 @@
-import { Plane } from "lucide-react";
+import { Plane, LogOut, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
   const location = useLocation();
+  const { user, signOut } = useAuth();
+
+  const navLink = (path: string, label: string) => (
+    <Link
+      to={path}
+      className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+        location.pathname === path
+          ? "bg-accent text-accent-foreground"
+          : "text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      {label}
+    </Link>
+  );
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-md">
@@ -16,26 +32,30 @@ const Navbar = () => {
           </span>
         </Link>
         <div className="flex items-center gap-1">
-          <Link
-            to="/"
-            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              location.pathname === "/"
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Input
-          </Link>
-          <Link
-            to="/dashboard"
-            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              location.pathname === "/dashboard"
-                ? "bg-accent text-accent-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Dashboard
-          </Link>
+          {navLink("/", "Home")}
+          {user && (
+            <>
+              {navLink("/analyze", "Analyze")}
+              {navLink("/dashboard", "Dashboard")}
+              {navLink("/history", "History")}
+            </>
+          )}
+          {user ? (
+            <div className="ml-3 flex items-center gap-2">
+              <span className="hidden sm:inline text-xs text-muted-foreground truncate max-w-[120px]">
+                {user.email}
+              </span>
+              <Button variant="ghost" size="sm" onClick={signOut} className="gap-1.5 text-muted-foreground hover:text-foreground">
+                <LogOut className="h-3.5 w-3.5" /> Sign Out
+              </Button>
+            </div>
+          ) : (
+            <Link to="/auth">
+              <Button variant="outline" size="sm" className="ml-3 gap-1.5">
+                <User className="h-3.5 w-3.5" /> Sign In
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </nav>
