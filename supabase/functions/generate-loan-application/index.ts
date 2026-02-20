@@ -46,7 +46,7 @@ IMPORTANT: Return ONLY the JSON object, no markdown, no code blocks, no extra te
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: "You are a professional loan application writer. Always respond with valid JSON only." },
+          { role: "system", content: "You are a professional loan application writer for FinPilot.ai. Always calculate numbers explicitly using provided inputs. Never invent missing data. Always respond in valid JSON only. No conversational text outside JSON." },
           { role: "user", content: prompt },
         ],
       }),
