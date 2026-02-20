@@ -14,7 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      financial_analyses: {
+        Row: {
+          ai_summary: string | null
+          burn_rate: number
+          cash: number
+          created_at: string
+          debt: number
+          debt_ratio: number
+          expenses: number
+          goal: string
+          id: string
+          improvements: Json | null
+          loan_application: Json | null
+          readiness_reason: string | null
+          readiness_score: number
+          recommendation: Json | null
+          rejection_risks: Json | null
+          revenue: number
+          risk_level: string
+          runway_months: string
+          user_id: string
+        }
+        Insert: {
+          ai_summary?: string | null
+          burn_rate?: number
+          cash: number
+          created_at?: string
+          debt: number
+          debt_ratio?: number
+          expenses: number
+          goal: string
+          id?: string
+          improvements?: Json | null
+          loan_application?: Json | null
+          readiness_reason?: string | null
+          readiness_score?: number
+          recommendation?: Json | null
+          rejection_risks?: Json | null
+          revenue: number
+          risk_level?: string
+          runway_months?: string
+          user_id: string
+        }
+        Update: {
+          ai_summary?: string | null
+          burn_rate?: number
+          cash?: number
+          created_at?: string
+          debt?: number
+          debt_ratio?: number
+          expenses?: number
+          goal?: string
+          id?: string
+          improvements?: Json | null
+          loan_application?: Json | null
+          readiness_reason?: string | null
+          readiness_score?: number
+          recommendation?: Json | null
+          rejection_risks?: Json | null
+          revenue?: number
+          risk_level?: string
+          runway_months?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          business_name: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_name?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_name?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
