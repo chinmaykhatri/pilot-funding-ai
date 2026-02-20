@@ -7,6 +7,14 @@ import {
   TrendingDown, Target, BarChart3, ArrowRight, CheckCircle2
 } from "lucide-react";
 
+const featureRoutes: Record<string, string> = {
+  "AI Financial Analysis": "/analyze",
+  "Funding Readiness Score": "/readiness-score",
+  "Smart Funding Recommendation": "/funding-recommendation",
+  "Loan Application Generator": "/loan-application",
+  "Loan Rejection Predictor": "/rejection-risks",
+  "Financial Improvement Roadmap": "/improvement-roadmap",
+};
 const features = [
   {
     icon: BarChart3,
@@ -124,13 +132,19 @@ const Index = () => {
             {features.map((f) => (
               <div
                 key={f.title}
-                className="group rounded-xl border border-border bg-card p-6 shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1"
+                className="group flex flex-col rounded-xl border border-border bg-card p-6 shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1"
               >
                 <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-lg ${f.bg}`}>
                   <f.icon className={`h-5 w-5 ${f.color}`} />
                 </div>
                 <h3 className="mb-2 font-heading text-lg font-semibold text-card-foreground">{f.title}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">{f.description}</p>
+                <p className="mb-4 flex-1 text-sm leading-relaxed text-muted-foreground">{f.description}</p>
+                <Link to={user ? (featureRoutes[f.title] || "/analyze") : "/auth"}>
+                  <Button variant="outline" size="sm" className="gap-1.5 w-full">
+                    <ArrowRight className="h-3.5 w-3.5" />
+                    {f.title === "AI Financial Analysis" ? "Run Analysis" : "Try Now"}
+                  </Button>
+                </Link>
               </div>
             ))}
           </div>
