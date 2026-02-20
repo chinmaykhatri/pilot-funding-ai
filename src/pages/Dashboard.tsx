@@ -64,7 +64,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <div className="mx-auto max-w-6xl px-6 py-8">
+      <div className="mx-auto max-w-6xl px-6 py-8 page-transition">
         {/* Header */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -104,50 +104,58 @@ const Dashboard = () => {
         </div>
 
         {/* AI Summary */}
-        <div ref={summaryRef} className="mb-6 scroll-mt-20 rounded-xl border border-primary/20 bg-primary/5 p-5 animate-fade-in">
+        <div ref={summaryRef} className="mb-6 scroll-mt-20 rounded-xl border border-primary/20 bg-primary/5 p-5 animate-fade-in ai-glow">
           <div className="mb-2 flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm font-semibold text-primary">AI Summary</span>
+            <span className="text-sm font-semibold text-primary">AI Executive Summary</span>
           </div>
           <p className="text-sm leading-relaxed text-foreground">{aiSummary}</p>
         </div>
 
         {/* Metric Cards */}
         <div ref={metricsRef} className="mb-6 scroll-mt-20 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <MetricCard
-            title="Burn Rate"
-            value={metrics.burnRate === 0 ? "₹0" : `₹${metrics.burnRate.toLocaleString()}`}
-            subtitle="Monthly cash burn"
-            icon={<Flame className="h-5 w-5" />}
-            variant={metrics.burnRate === 0 ? "success" : "warning"}
-          />
-          <MetricCard
-            title="Runway"
-            value={metrics.runwayMonths === "stable" ? "Stable" : `${metrics.runwayMonths} months`}
-            subtitle="Cash runway remaining"
-            icon={<Clock className="h-5 w-5" />}
-            variant={metrics.runwayMonths === "stable" || (typeof metrics.runwayMonths === "number" && metrics.runwayMonths > 12) ? "success" : "warning"}
-          />
-          <MetricCard
-            title="Risk Level"
-            value={metrics.riskLevel}
-            subtitle="Overall risk assessment"
-            icon={<AlertTriangle className="h-5 w-5" />}
-            variant={riskVariant}
-          />
-          <MetricCard
-            title="Debt Ratio"
-            value={metrics.debtRatio.toFixed(2)}
-            subtitle="Debt to annual revenue"
-            icon={<Activity className="h-5 w-5" />}
-            variant={metrics.debtRatio < 0.5 ? "success" : "destructive"}
-          />
+          <div className="stagger-init animate-slide-up stagger-1">
+            <MetricCard
+              title="Cash Burn Rate"
+              value={metrics.burnRate === 0 ? "₹0 (Profitable)" : `₹${metrics.burnRate.toLocaleString("en-IN")}/mo`}
+              subtitle="Monthly net cash outflow"
+              icon={<Flame className="h-5 w-5" />}
+              variant={metrics.burnRate === 0 ? "success" : "warning"}
+            />
+          </div>
+          <div className="stagger-init animate-slide-up stagger-2">
+            <MetricCard
+              title="Cash Runway"
+              value={metrics.runwayMonths === "stable" ? "∞ Stable" : `${metrics.runwayMonths} mo`}
+              subtitle="Time before cash runs out"
+              icon={<Clock className="h-5 w-5" />}
+              variant={metrics.runwayMonths === "stable" || (typeof metrics.runwayMonths === "number" && metrics.runwayMonths > 12) ? "success" : "warning"}
+            />
+          </div>
+          <div className="stagger-init animate-slide-up stagger-3">
+            <MetricCard
+              title="Overall Risk"
+              value={metrics.riskLevel}
+              subtitle="Lender risk assessment"
+              icon={<AlertTriangle className="h-5 w-5" />}
+              variant={riskVariant}
+            />
+          </div>
+          <div className="stagger-init animate-slide-up stagger-4">
+            <MetricCard
+              title="Debt-to-Revenue"
+              value={`${metrics.debtRatio.toFixed(2)}x`}
+              subtitle="Debt ÷ annual revenue"
+              icon={<Activity className="h-5 w-5" />}
+              variant={metrics.debtRatio < 0.5 ? "success" : "destructive"}
+            />
+          </div>
         </div>
 
         {/* Score + Recommendation */}
         <div className="mb-6 grid gap-6 lg:grid-cols-2">
           <div ref={scoreRef} className="scroll-mt-20">
-            <ScoreGauge score={readiness.score} reason={readiness.reason} />
+            <ScoreGauge readiness={readiness} />
           </div>
           <div ref={recommendRef} className="scroll-mt-20">
             <FundingPanel recommendation={recommendation} />
@@ -158,7 +166,7 @@ const Dashboard = () => {
         <div ref={loanRef} className="mb-6 scroll-mt-20">
           <Button
             onClick={() => setShowLoan(!showLoan)}
-            className="mb-4 gap-2 gradient-primary text-primary-foreground shadow-primary"
+            className="mb-4 gap-2 gradient-primary text-primary-foreground shadow-primary btn-premium"
           >
             <FileText className="h-4 w-4" />
             {showLoan ? "Hide Loan Application" : "Generate Loan Application"}
@@ -169,10 +177,10 @@ const Dashboard = () => {
         {/* Risks + Improvements */}
         <div className="grid gap-6 lg:grid-cols-2">
           <div ref={risksRef} className="scroll-mt-20">
-            <RejectionPredictor risks={rejectionRisks.risks} />
+            <RejectionPredictor analysis={rejectionRisks} />
           </div>
           <div ref={improvementsRef} className="scroll-mt-20">
-            <ImprovementRoadmap steps={improvements.steps} />
+            <ImprovementRoadmap roadmap={improvements} />
           </div>
         </div>
       </div>

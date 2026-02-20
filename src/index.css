@@ -118,4 +118,55 @@
   .shadow-primary {
     box-shadow: var(--shadow-primary);
   }
+
+  /* Page transition wrapper */
+  .page-transition {
+    animation: page-enter 0.3s ease-out forwards;
+  }
+
+  /* Card interactive hover — lift + shadow, NO vertical layout shift */
+  .card-interactive {
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+  }
+  .card-interactive:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+  }
+
+  /* Button premium — scale up hover, press down on click, NO vertical jump */
+  .btn-premium {
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+    transform: scale(1);
+  }
+  .btn-premium:hover {
+    transform: scale(1.02);
+  }
+  .btn-premium:active {
+    transform: scale(0.98);
+    transition: transform 0.08s ease;
+  }
+
+  /* Staggered animation delays for sequential card reveals */
+  .stagger-1 { animation-delay: 0ms; }
+  .stagger-2 { animation-delay: 80ms; }
+  .stagger-3 { animation-delay: 160ms; }
+  .stagger-4 { animation-delay: 240ms; }
+  .stagger-5 { animation-delay: 320ms; }
+  .stagger-6 { animation-delay: 400ms; }
+
+  /* Start invisible for staggered items (opacity animated by keyframe) */
+  .stagger-init {
+    opacity: 0;
+  }
+
+  /* AI summary glow highlight */
+  .ai-glow {
+    animation: glow-once 1.5s ease-out 0.3s forwards;
+  }
+
+  /* Loading spinner with text */
+  .loading-pulse {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
 }
+

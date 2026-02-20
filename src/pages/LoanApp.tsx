@@ -3,20 +3,18 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import LoanApplicationView from "@/components/LoanApplicationView";
 import RejectionPredictor from "@/components/RejectionPredictor";
-import { LoanApplication } from "@/lib/financial-calculations";
+import { FormalLoanApplication, generateLoanApplication } from "@/lib/loan-application-generator";
+import { calculateMetrics, calculateReadinessScore } from "@/lib/financial-calculations";
+import { RejectionAnalysis, analyzeRejectionRisks } from "@/lib/rejection-risk-engine";
 import { ArrowLeft, FileText, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 
 const LoanApp = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [application, setApplication] = useState<LoanApplication | null>(null);
-  const [rejectionRisks, setRejectionRisks] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [application, setApplication] = useState<FormalLoanApplication | null>(null);
+  const [rejectionAnalysis, setRejectionAnalysis] = useState<RejectionAnalysis | null>(null);
   const [form, setForm] = useState({
     businessName: "",
     industry: "",
@@ -35,7 +33,7 @@ const LoanApp = () => {
       try {
         const results = JSON.parse(stored);
         if (results.loanApplication) setApplication(results.loanApplication);
-        if (results.rejectionRisks?.risks) setRejectionRisks(results.rejectionRisks.risks);
+        if (results.rejectionRisks) setRejectionAnalysis(results.rejectionRisks);
       } catch { /* ignore */ }
     }
   }, []);
@@ -48,36 +46,24 @@ const LoanApp = () => {
     }));
   };
 
-  const handleGenerate = async () => {
-    if (!form.fundingPurpose) {
-      toast({ title: "Please enter a funding purpose", variant: "destructive" });
-      return;
-    }
-    if (form.revenue <= 0) {
-      toast({ title: "Please enter a valid monthly revenue", variant: "destructive" });
-      return;
-    }
-    if (form.fundingAmount <= 0) {
-      toast({ title: "Please enter a funding amount", variant: "destructive" });
-      return;
-    }
+  const handleGenerate = () => {
+    const app = generateLoanApplication(form);
+    setApplication(app);
 
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("generate-loan-application", {
-        body: form,
-      });
-      if (error) throw error;
-      if (data.error) throw new Error(data.error);
-      const { rejectionRisks: risks, ...loanApp } = data;
-      setApplication(loanApp);
-      setRejectionRisks(risks || []);
-    } catch (e: any) {
-      console.error(e);
-      toast({ title: "Generation failed", description: e.message || "Please try again.", variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
+    // Run the full rejection risk engine
+    const metrics = calculateMetrics({
+      revenue: form.revenue,
+      expenses: form.expenses,
+      cash: form.cash,
+      debt: form.debt,
+      goal: form.fundingPurpose,
+    });
+    const readiness = calculateReadinessScore(metrics, form.revenue);
+    const analysis = analyzeRejectionRisks(
+      metrics, readiness, form.revenue, form.expenses,
+      form.cash, form.debt, form.fundingAmount, form.fundingPurpose
+    );
+    setRejectionAnalysis(analysis);
   };
 
   const fields = [
@@ -90,6 +76,8 @@ const LoanApp = () => {
     { key: "fundingAmount", label: "Funding Amount Requested (₹)", placeholder: "e.g. 2500000", type: "number" },
     { key: "fundingPurpose", label: "Purpose of Funding", placeholder: "e.g. Equipment purchase, Business expansion", type: "text" },
   ];
+
+  const isFormValid = form.revenue > 0 && form.fundingAmount > 0 && form.fundingPurpose.length > 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -107,6 +95,9 @@ const LoanApp = () => {
             Loan Application Generator
           </h1>
         </div>
+        <p className="mb-6 text-sm text-muted-foreground">
+          Generate a professional, print-ready loan application letter in the standard Indian bank format. Includes instant credit risk assessment — no AI wait time.
+        </p>
 
         {/* Manual Input Form */}
         <div className="mb-8 rounded-2xl border border-border bg-card p-6 shadow-card">
@@ -114,7 +105,7 @@ const LoanApp = () => {
             Enter Business Details
           </h2>
           <p className="mb-5 text-sm text-muted-foreground">
-            Fill in your business details to generate a professional bank-ready loan application.
+            Fill in your business details to generate a formal bank-ready loan application letter with risk assessment.
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
             {fields.map(({ key, label, placeholder, type }) => (
@@ -136,22 +127,18 @@ const LoanApp = () => {
           <Button
             className="mt-5 h-11 w-full gap-2 gradient-primary text-primary-foreground shadow-primary font-semibold"
             onClick={handleGenerate}
-            disabled={loading}
+            disabled={!isFormValid}
           >
-            {loading ? (
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
-            ) : (
-              <Sparkles className="h-4 w-4" />
-            )}
-            {loading ? "Generating with AI..." : "Generate Loan Application"}
+            <Sparkles className="h-4 w-4" />
+            Generate Loan Application
           </Button>
         </div>
 
-        {/* Generated Application */}
+        {/* Generated Application + Risk Analysis */}
         {application && (
           <div className="space-y-6">
             <LoanApplicationView application={application} />
-            {rejectionRisks.length > 0 && <RejectionPredictor risks={rejectionRisks} />}
+            {rejectionAnalysis && <RejectionPredictor analysis={rejectionAnalysis} />}
           </div>
         )}
       </div>

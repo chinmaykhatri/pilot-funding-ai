@@ -33,33 +33,19 @@ PRE-CALCULATED METRICS:
 - Risk Level: ${riskLevel}
 - Funding Readiness Score: ${readinessScore}/100
 
+SCORING BREAKDOWN (deterministic, already calculated):
+- Runway Factor (max 40): stable or >12mo → 40, 6–12 → 25, 3–6 → 15, <3 → 5
+- Cash Flow Health (max 30): profitable → 30, burn <20% rev → 20, 20–50% → 12, >50% → 5
+- Debt Ratio (max 30): <0.2 → 30, 0.2–0.5 → 20, 0.5–0.8 → 10, >0.8 → 5
+- Classification: 80–100 → Strong, 60–79 → Moderate, 40–59 → Weak, <40 → High Risk
+
+
 Provide your response as a valid JSON object with these exact keys:
 {
-  "aiSummary": "A 2-3 sentence executive summary of the business financial health",
-  "readinessReason": "A short explanation of why the readiness score is ${readinessScore}/100",
-  "recommendation": {
-    "fundingType": "Recommended funding type (e.g., Term Loan, Working Capital Loan, Govt Scheme like MUDRA/CGTMSE, Venture Debt, etc.)",
-    "amountRange": "Suggested amount range (e.g., ₹5L - ₹10L)",
-    "timing": "Best timing to apply",
-    "reason": "Short reasoning for this recommendation",
-    "schemes": [
-      {"name": "Scheme name (e.g., MUDRA Yojana, CGTMSE, Stand-Up India, PSB Loans in 59 Minutes, etc.)", "description": "1-2 sentence description of the scheme and its benefits", "eligibility": "Key eligibility criteria for this MSME"},
-      {"name": "Another relevant scheme", "description": "Description", "eligibility": "Eligibility"}
-    ]
-  },
-  "loanApplication": {
-    "businessSummary": "Professional business summary for bank submission (3-4 sentences)",
-    "fundingRequirement": "Detailed funding requirement statement",
-    "financialJustification": "Financial justification with key metrics",
-    "repaymentCapability": "Repayment capability assessment"
-  },
-  "rejectionRisks": {
-    "risks": ["Risk 1", "Risk 2", "Risk 3"]
-  },
-  "improvements": {
-    "steps": ["Step 1", "Step 2", "Step 3"]
-  }
+  "aiSummary": "A 2-3 sentence executive summary referencing the readiness score of ${readinessScore}/100 and its classification"
 }
+
+NOTE: Do NOT include funding recommendations, scheme suggestions, loan application drafts, rejection risks, or improvement steps — all of those are calculated deterministically by the client.
 
 IMPORTANT: Return ONLY the JSON object, no markdown, no code blocks, no extra text.`;
 
@@ -107,7 +93,14 @@ IMPORTANT: Return ONLY the JSON object, no markdown, no code blocks, no extra te
       cleaned = cleaned.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
     }
 
-    const parsed = JSON.parse(cleaned);
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch {
+      // AI returned malformed JSON — use the raw text as summary
+      console.warn("Failed to parse AI JSON, using raw content as fallback");
+      parsed = { aiSummary: cleaned.substring(0, 500) };
+    }
 
     return new Response(JSON.stringify(parsed), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

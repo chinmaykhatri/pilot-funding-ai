@@ -6,6 +6,7 @@ import {
   Sparkles, TrendingUp, Shield, Zap, FileText, AlertTriangle,
   TrendingDown, Target, BarChart3, ArrowRight, CheckCircle2
 } from "lucide-react";
+import FAQ from "@/components/FAQ";
 
 const featureRoutes: Record<string, string> = {
   "AI Financial Analysis": "/analyze",
@@ -68,7 +69,7 @@ const Index = () => {
       <Navbar />
 
       {/* Hero */}
-      <div className="gradient-hero py-24">
+      <div className="gradient-hero py-24 page-transition">
         <div className="mx-auto max-w-4xl px-6 text-center">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
             <Sparkles className="h-3.5 w-3.5" /> AI-Powered Financial Copilot for MSMEs
@@ -83,7 +84,7 @@ const Index = () => {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link to={user ? "/analyze" : "/auth"}>
-              <Button className="h-13 gap-2 gradient-primary text-primary-foreground shadow-primary px-8 text-base font-semibold">
+              <Button className="h-13 gap-2 gradient-primary text-primary-foreground shadow-primary px-8 text-base font-semibold btn-premium">
                 <Sparkles className="h-4 w-4" />
                 {user ? "Analyze Now" : "Get Started Free"}
               </Button>
@@ -129,10 +130,10 @@ const Index = () => {
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {features.map((f) => (
+            {features.map((f, i) => (
               <div
                 key={f.title}
-                className="group flex flex-col rounded-xl border border-border bg-card p-6 shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1"
+                className={`group flex flex-col rounded-xl border border-border bg-card p-6 shadow-card card-interactive stagger-init animate-slide-up stagger-${i + 1}`}
               >
                 <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-lg ${f.bg}`}>
                   <f.icon className={`h-5 w-5 ${f.color}`} />
@@ -140,7 +141,7 @@ const Index = () => {
                 <h3 className="mb-2 font-heading text-lg font-semibold text-card-foreground">{f.title}</h3>
                 <p className="mb-4 flex-1 text-sm leading-relaxed text-muted-foreground">{f.description}</p>
                 <Link to={user ? (featureRoutes[f.title] || "/analyze") : "/auth"}>
-                  <Button variant="outline" size="sm" className="gap-1.5 w-full">
+                  <Button variant="outline" size="sm" className="gap-1.5 w-full btn-premium">
                     <ArrowRight className="h-3.5 w-3.5" />
                     {f.title === "AI Financial Analysis" ? "Run Analysis" : "Try Now"}
                   </Button>
@@ -174,7 +175,7 @@ const Index = () => {
           </div>
           <div className="mt-12 text-center">
             <Link to={user ? "/analyze" : "/auth"}>
-              <Button className="h-12 gap-2 gradient-primary text-primary-foreground shadow-primary px-8 text-base font-semibold">
+              <Button className="h-12 gap-2 gradient-primary text-primary-foreground shadow-primary px-8 text-base font-semibold btn-premium">
                 <ArrowRight className="h-4 w-4" />
                 {user ? "Start Analysis" : "Get Started Now"}
               </Button>
@@ -182,6 +183,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* FAQ Section */}
+      <FAQ />
 
       {/* Footer */}
       <footer className="border-t border-border bg-card py-8">

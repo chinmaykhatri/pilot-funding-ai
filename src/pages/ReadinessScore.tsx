@@ -31,7 +31,7 @@ const ReadinessScore = () => {
         <p className="mb-6 text-sm text-muted-foreground">
           Calculated using: Runway Factor (40%) + Cash Flow Health (30%) + Debt Ratio (30%)
         </p>
-        <ScoreGauge score={results.readiness.score} reason={results.readiness.reason} />
+        <ScoreGauge readiness={results.readiness} />
       </div>
     </div>
   );

@@ -26,12 +26,12 @@ const RejectionRisks = () => {
         </button>
         <div className="mb-6 flex items-center gap-2">
           <AlertTriangle className="h-6 w-6 text-destructive" />
-          <h1 className="font-heading text-2xl font-bold text-foreground">Loan Rejection Predictor</h1>
+          <h1 className="font-heading text-2xl font-bold text-foreground">Loan Rejection Risk Analysis</h1>
         </div>
         <p className="mb-6 text-sm text-muted-foreground">
-          AI-identified risks that could lead to loan rejection. Address these before applying.
+          Deterministic credit risk assessment based on your financial data and Indian MSME lending criteria. Address these risks before applying.
         </p>
-        <RejectionPredictor risks={results.rejectionRisks.risks} />
+        <RejectionPredictor analysis={results.rejectionRisks} />
       </div>
     </div>
   );

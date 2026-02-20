@@ -1,33 +1,55 @@
+import { FundingReadiness } from "@/lib/financial-calculations";
+
 interface ScoreGaugeProps {
-  score: number;
-  reason: string;
+  readiness: FundingReadiness;
 }
 
-const ScoreGauge = ({ score, reason }: ScoreGaugeProps) => {
+const ScoreGauge = ({ readiness }: ScoreGaugeProps) => {
+  const { readiness_score: score, classification, breakdown, professional_explanation } = readiness;
+
   const getColor = () => {
-    if (score >= 70) return "text-success";
-    if (score >= 40) return "text-warning";
+    if (score >= 80) return "text-success";
+    if (score >= 60) return "text-warning";
+    if (score >= 40) return "text-orange-400";
     return "text-destructive";
   };
 
   const getBarColor = () => {
-    if (score >= 70) return "bg-success";
-    if (score >= 40) return "bg-warning";
+    if (score >= 80) return "bg-success";
+    if (score >= 60) return "bg-warning";
+    if (score >= 40) return "bg-orange-400";
     return "bg-destructive";
   };
 
-  const getLabel = () => {
-    if (score >= 70) return "Strong";
-    if (score >= 40) return "Moderate";
-    return "Needs Work";
+  const getClassificationColor = () => {
+    if (classification === "Strong") return "text-success bg-success/10 border-success/30";
+    if (classification === "Moderate") return "text-warning bg-warning/10 border-warning/30";
+    if (classification === "Weak") return "text-orange-400 bg-orange-400/10 border-orange-400/30";
+    return "text-destructive bg-destructive/10 border-destructive/30";
   };
+
+  const getFactorBarColor = (points: number, max: number) => {
+    const pct = points / max;
+    if (pct >= 0.8) return "bg-success";
+    if (pct >= 0.5) return "bg-warning";
+    if (pct >= 0.3) return "bg-orange-400";
+    return "bg-destructive";
+  };
+
+  const factors = [
+    { label: "Runway", key: "runway" as const, icon: "🛤️" },
+    { label: "Cash Flow", key: "cashflow" as const, icon: "💰" },
+    { label: "Debt Ratio", key: "debt" as const, icon: "📊" },
+  ];
 
   return (
     <div className="rounded-xl border border-border bg-card p-6 shadow-card animate-fade-in">
       <h3 className="mb-4 font-heading text-lg font-semibold text-card-foreground">
         Funding Readiness Score
       </h3>
-      <div className="flex items-center gap-6">
+
+      {/* Score Gauge + Classification */}
+      <div className="flex items-center gap-6 mb-5">
         <div className="relative flex h-28 w-28 flex-shrink-0 items-center justify-center">
           <svg className="h-28 w-28 -rotate-90" viewBox="0 0 100 100">
             <circle cx="50" cy="50" r="42" fill="none" stroke="hsl(var(--muted))" strokeWidth="8" />
@@ -51,7 +73,9 @@ const ScoreGauge = ({ score, reason }: ScoreGaugeProps) => {
         <div className="flex-1 space-y-3">
           <div>
             <div className="mb-1 flex items-center justify-between">
-              <span className="text-sm font-medium text-card-foreground">{getLabel()}</span>
+              <span className={`inline-block rounded-full border px-3 py-0.5 text-xs font-semibold ${getClassificationColor()}`}>
+                {classification}
+              </span>
               <span className="text-sm text-muted-foreground">{score}%</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
@@ -61,8 +85,35 @@ const ScoreGauge = ({ score, reason }: ScoreGaugeProps) => {
               />
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">{reason}</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">{professional_explanation}</p>
         </div>
+      </div>
+
+      {/* Factor Breakdown */}
+      <div className="space-y-3 border-t border-border pt-4">
+        <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Score Breakdown</h4>
+        {factors.map(({ label, key, icon }) => {
+          const factor = breakdown[key];
+          return (
+            <div key={key} className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-1.5 text-sm font-medium text-card-foreground">
+                  <span>{icon}</span> {label}
+                </span>
+                <span className="text-sm font-semibold text-card-foreground">
+                  {factor.points}<span className="text-muted-foreground font-normal">/{factor.max}</span>
+                </span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className={`h-full rounded-full transition-all duration-700 ease-out ${getFactorBarColor(factor.points, factor.max)}`}
+                  style={{ width: `${(factor.points / factor.max) * 100}%` }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">{factor.reason}</p>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
