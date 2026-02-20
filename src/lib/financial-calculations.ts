@@ -18,11 +18,18 @@ export interface FundingReadiness {
   reason: string;
 }
 
+export interface FundingScheme {
+  name: string;
+  description: string;
+  eligibility: string;
+}
+
 export interface FundingRecommendation {
   fundingType: string;
   amountRange: string;
   timing: string;
   reason: string;
+  schemes: FundingScheme[];
 }
 
 export interface LoanApplication {

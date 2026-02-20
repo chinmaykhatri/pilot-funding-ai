@@ -41,7 +41,11 @@ Provide your response as a valid JSON object with these exact keys:
     "fundingType": "Recommended funding type (e.g., Term Loan, Working Capital Loan, Govt Scheme like MUDRA/CGTMSE, Venture Debt, etc.)",
     "amountRange": "Suggested amount range (e.g., ₹5L - ₹10L)",
     "timing": "Best timing to apply",
-    "reason": "Short reasoning for this recommendation"
+    "reason": "Short reasoning for this recommendation",
+    "schemes": [
+      {"name": "Scheme name (e.g., MUDRA Yojana, CGTMSE, Stand-Up India, PSB Loans in 59 Minutes, etc.)", "description": "1-2 sentence description of the scheme and its benefits", "eligibility": "Key eligibility criteria for this MSME"},
+      {"name": "Another relevant scheme", "description": "Description", "eligibility": "Eligibility"}
+    ]
   },
   "loanApplication": {
     "businessSummary": "Professional business summary for bank submission (3-4 sentences)",
