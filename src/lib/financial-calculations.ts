@@ -68,17 +68,37 @@ export function calculateMetrics(data: FinancialData): FinancialMetrics {
   return { burnRate, runwayMonths, debtRatio, riskLevel };
 }
 
-// Funding Readiness Score (deterministic formula)
-export function calculateReadinessScore(metrics: FinancialMetrics): number {
-  let runwayFactor = 0;
-  if (metrics.runwayMonths === "stable") {
+// Funding Readiness Score (deterministic discrete-tier formula)
+export function calculateReadinessScore(metrics: FinancialMetrics, revenue: number): number {
+  // Runway factor (max 40)
+  let runwayFactor: number;
+  if (metrics.runwayMonths === "stable" || (typeof metrics.runwayMonths === "number" && metrics.runwayMonths > 12)) {
     runwayFactor = 40;
+  } else if (typeof metrics.runwayMonths === "number" && metrics.runwayMonths >= 6) {
+    runwayFactor = 25;
   } else {
-    runwayFactor = Math.min(40, (metrics.runwayMonths / 24) * 40);
+    runwayFactor = 10;
   }
 
-  const cashFlowHealth = metrics.burnRate === 0 ? 30 : Math.max(0, 30 - (metrics.burnRate / 10000) * 15);
-  const debtFactor = Math.max(0, 30 - metrics.debtRatio * 30);
+  // Debt factor (max 30)
+  let debtFactor: number;
+  if (metrics.debtRatio < 0.2) {
+    debtFactor = 30;
+  } else if (metrics.debtRatio <= 0.5) {
+    debtFactor = 20;
+  } else {
+    debtFactor = 10;
+  }
 
-  return Math.round(Math.min(100, runwayFactor + cashFlowHealth + debtFactor));
+  // Cashflow factor (max 30)
+  let cashflowFactor: number;
+  if (metrics.burnRate === 0) {
+    cashflowFactor = 30;
+  } else if (revenue > 0 && metrics.burnRate < revenue * 0.2) {
+    cashflowFactor = 20;
+  } else {
+    cashflowFactor = 10;
+  }
+
+  return Math.round(Math.min(100, runwayFactor + debtFactor + cashflowFactor));
 }

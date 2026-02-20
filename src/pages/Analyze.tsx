@@ -54,7 +54,7 @@ const Analyze = () => {
     setLoading(true);
     try {
       const metrics = calculateMetrics(form);
-      const readinessScore = calculateReadinessScore(metrics);
+      const readinessScore = calculateReadinessScore(metrics, form.revenue);
 
       const { data, error } = await supabase.functions.invoke("financial-analysis", {
         body: { financialData: form, metrics, readinessScore },

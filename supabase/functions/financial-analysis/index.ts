@@ -68,7 +68,7 @@ IMPORTANT: Return ONLY the JSON object, no markdown, no code blocks, no extra te
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: "You are a financial analysis AI. Always respond with valid JSON only." },
+          { role: "system", content: "You are the backend financial engine for FinPilot.ai, a Pre-Loan Financial Intelligence Platform for MSMEs. Always calculate numbers explicitly using provided inputs. Never invent missing data. If calculation impossible, return 'Insufficient Data'. Always respond in valid JSON only. No conversational text outside JSON. Keep outputs concise and structured for dashboard display." },
           { role: "user", content: prompt },
         ],
       }),
