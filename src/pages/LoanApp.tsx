@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import LoanApplicationView from "@/components/LoanApplicationView";
+import RejectionPredictor from "@/components/RejectionPredictor";
 import { LoanApplication } from "@/lib/financial-calculations";
 import { ArrowLeft, FileText, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ const LoanApp = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [application, setApplication] = useState<LoanApplication | null>(null);
+  const [rejectionRisks, setRejectionRisks] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     businessName: "",
@@ -33,6 +35,7 @@ const LoanApp = () => {
       try {
         const results = JSON.parse(stored);
         if (results.loanApplication) setApplication(results.loanApplication);
+        if (results.rejectionRisks?.risks) setRejectionRisks(results.rejectionRisks.risks);
       } catch { /* ignore */ }
     }
   }, []);
@@ -66,7 +69,9 @@ const LoanApp = () => {
       });
       if (error) throw error;
       if (data.error) throw new Error(data.error);
-      setApplication(data);
+      const { rejectionRisks: risks, ...loanApp } = data;
+      setApplication(loanApp);
+      setRejectionRisks(risks || []);
     } catch (e: any) {
       console.error(e);
       toast({ title: "Generation failed", description: e.message || "Please try again.", variant: "destructive" });
@@ -143,7 +148,12 @@ const LoanApp = () => {
         </div>
 
         {/* Generated Application */}
-        {application && <LoanApplicationView application={application} />}
+        {application && (
+          <div className="space-y-6">
+            <LoanApplicationView application={application} />
+            {rejectionRisks.length > 0 && <RejectionPredictor risks={rejectionRisks} />}
+          </div>
+        )}
       </div>
     </div>
   );

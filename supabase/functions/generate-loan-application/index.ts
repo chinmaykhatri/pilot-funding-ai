@@ -31,7 +31,8 @@ Provide your response as a valid JSON object with these exact keys:
   "businessSummary": "Professional business summary for bank submission (3-4 sentences, include business name and industry)",
   "fundingRequirement": "Detailed funding requirement statement with amount and purpose",
   "financialJustification": "Financial justification with key metrics showing the business can handle the loan",
-  "repaymentCapability": "Repayment capability assessment based on revenue and expenses"
+  "repaymentCapability": "Repayment capability assessment based on revenue and expenses",
+  "rejectionRisks": ["Risk 1 - specific reason this application might be rejected", "Risk 2", "Risk 3"]
 }
 
 IMPORTANT: Return ONLY the JSON object, no markdown, no code blocks, no extra text.`;
